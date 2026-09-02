@@ -1,16 +1,18 @@
 <?php
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 ?>
 <html>
     <head>
-        <title>ty bca project</title>
+        <title>StyleHub - AI Shopping Assistant</title>
 
         <!--css connect-->
         <link rel="stylesheet" href="style.css">
         
     </head>
     <body>
-
 
         <!-- javaScript connect-->
          <script>
@@ -20,14 +22,13 @@ session_start();
          <script src="script.js"></script>
 
 <div class="logo">
-
     <h1>Kurti Gallery</h1>
 </div>
 
 <nav>
 <a href="#home">Home</a>
 <a href="#products-title">Products</a>
-<a href="cart.php">🛒 Cart</a>
+<a href="cart.php">🛒 Cart <span id="cartBadge" style="background:#8b3a3a; color:white; border-radius:12px; padding:2px 8px; font-size:14px; font-weight:bold;">0</span></a>
 <?php if(isset($_SESSION['name']) && !empty($_SESSION['name'])): ?>
     <span style="color:#fff; padding:0 10px;">👤 <?php echo htmlspecialchars($_SESSION['name']); ?></span>
     <a href="login.php">Log out</a>
@@ -147,22 +148,78 @@ session_start();
 </section>
 
 <script>
-function addToCart(productname, price, image){
-      let userName = localStorage.getItem("name") || "Guest";
-      let cart = JSON.parse(localStorage.getItem("cart_" + userName)) || [];
+// Universal Cart helper functions (handles all legacy and current keys)
+function getCart() {
+    let items = [];
+    try {
+        let raw = localStorage.getItem("stylehub_cart") || localStorage.getItem("cart");
+        if (raw) {
+            let parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+        let userName = localStorage.getItem("name") || "Guest";
+        let userRaw = localStorage.getItem("cart_" + userName);
+        if (userRaw) {
+            let parsed = JSON.parse(userRaw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                saveCart(parsed);
+                return parsed;
+            }
+        }
+        let guestRaw = localStorage.getItem("cart_Guest");
+        if (guestRaw) {
+            let parsed = JSON.parse(guestRaw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                saveCart(parsed);
+                return parsed;
+            }
+        }
+        for (let i = 0; i < localStorage.length; i++) {
+            let k = localStorage.key(i);
+            if (k && k.startsWith("cart_")) {
+                let parsed = JSON.parse(localStorage.getItem(k));
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    saveCart(parsed);
+                    return parsed;
+                }
+            }
+        }
+    } catch(e) {
+        console.error("Cart error:", e);
+    }
+    return [];
+}
 
-      cart.push({
+function saveCart(cart) {
+    let json = JSON.stringify(cart);
+    localStorage.setItem("stylehub_cart", json);
+    localStorage.setItem("cart", json);
+    let userName = localStorage.getItem("name") || "Guest";
+    localStorage.setItem("cart_" + userName, json);
+    updateCartCount();
+}
+
+function updateCartCount() {
+    let cart = getCart();
+    let count = cart.length;
+    let badge = document.getElementById("cartBadge");
+    if (badge) badge.innerText = count;
+    let linkCounts = document.querySelectorAll(".cartBadgeCount");
+    linkCounts.forEach(function(el) { el.innerText = count; });
+}
+
+function addToCart(productname, price, image){
+    let cart = getCart();
+    cart.push({
         name: productname,
-        price: price,
+        price: Number(price),
         image: image
     });
-
-    localStorage.setItem("cart_" + userName, JSON.stringify(cart));
-    alert(productname + " added to cart successfully!");
+    saveCart(cart);
+    alert(productname + " added to cart successfully! (Total items in cart: " + cart.length + ")");
 }
 
 function askAI() {
-
     let input = document.getElementById("aiInput").value.toLowerCase();
     let response = document.getElementById("aiResponse");
 
@@ -193,9 +250,12 @@ function askAI() {
     }
 }
 
+// Update cart badge immediately upon page load
+document.addEventListener("DOMContentLoaded", updateCartCount);
+updateCartCount();
 </script>
-<div class="cart-link">
-<a href="cart.php">🛒 cart</a>
+<div class="cart-link" style="text-align:center; margin:30px 0;">
+<a href="cart.php" style="background:#8b3a3a; color:white; padding:12px 25px; border-radius:8px; text-decoration:none; font-size:18px;">🛒 View Shopping Cart (<span class="cartBadgeCount">0</span>)</a>
 </div>
 </body>
 </html>

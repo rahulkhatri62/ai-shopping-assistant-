@@ -1,5 +1,9 @@
 <?php
 session_start();
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 include("db.php");
 
 if(isset($_POST['login']))
@@ -63,12 +67,16 @@ body{
 h2{
     text-align:center;
     margin-bottom:20px;
+    color:white;
 }
 
 input{
     width:100%;
     padding:10px;
     margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:5px;
+    font-size:14px;
 }
 
 button{
@@ -80,6 +88,8 @@ button{
     border-radius:5px;
     cursor:pointer;
     font-size:16px;
+    font-weight:bold;
+    margin-top:10px;
 }
 
 button:hover{
@@ -91,21 +101,34 @@ button:hover{
 <body>
 
 <div class="login-box">
-    <h2>clothing store Login</h2>
+    <h2>Clothing Store Login</h2>
 
-<form method="POST">
-    <input type="text" name="username" placeholder="enter username" required onkeydown="if(event.key=='Enter'){event.preventDefault(); document.getElementById('password').focus();}">
-    <input type="password" name="password" id="password" placeholder="enter password" required>
-    <button type="submit" name="login">login</button>
-    <p style="text-align:center;
-      margin-top:15px">
+<form id="loginForm" method="POST" action="login.php">
+    <input type="text" id="usernameInput" name="username" placeholder="Enter username" required autocomplete="username">
+    <input type="password" id="passwordInput" name="password" placeholder="Enter password" required autocomplete="current-password">
+    <button type="submit" id="loginButton" name="login">Login</button>
+    <p style="text-align:center; margin-top:15px; color:white;">
       Don't have an account?
-      <a href="registration.php" style="color:pink; text-decoration:none;
-      font-weight:bold;">register</a>
+      <a href="registration.php" style="color:#ffe4e1; text-decoration:none; font-weight:bold;">Register</a>
     </p>
 </form>
 
 </div>
+
+<script>
+// Prevent Enter on username from submitting form or redirecting; focus password instead
+const usernameField = document.getElementById('usernameInput');
+const passwordField = document.getElementById('passwordInput');
+
+usernameField.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+        event.preventDefault();
+        event.stopPropagation();
+        passwordField.focus();
+        return false;
+    }
+});
+</script>
 
 </body>
 </html>

@@ -24,6 +24,8 @@ VALUES ('$user_id', '$product_name', '$quantity', '$total_amount')";
 
 if(mysqli_query($conn, $sql)){
     echo "<script>
+            localStorage.removeItem('stylehub_cart');
+            localStorage.removeItem('cart');
             let userName = localStorage.getItem('name') || 'Guest';
             localStorage.removeItem('cart_' + userName);
             localStorage.removeItem('cart_Guest');
