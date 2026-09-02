@@ -1,32 +1,34 @@
-// StyleHub Scripts
+﻿// StyleHub Client Utilities & Animations
 
-// Safe product search listener
 document.addEventListener("DOMContentLoaded", function () {
+    // Smooth Scrolling for Anchor Links
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener("click", function(e) {
+            let targetId = this.getAttribute("href");
+            if (targetId && targetId !== "#") {
+                let targetEl = document.querySelector(targetId);
+                if (targetEl) {
+                    e.preventDefault();
+                    targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+        });
+    });
+
+    // Optional Live Search for items
     let searchInput = document.getElementById("search");
     if (searchInput) {
         searchInput.addEventListener("input", function () {
-            let searchText = this.value.toLowerCase();
-            let products = document.querySelectorAll(".product, .card");
-
-            products.forEach(function (product) {
-                let text = product.innerText.toLowerCase();
-                if (text.includes(searchText)) {
-                    product.style.display = "";
+            let query = this.value.toLowerCase().trim();
+            let cards = document.querySelectorAll(".product-card");
+            cards.forEach(function (card) {
+                let text = card.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = "";
                 } else {
-                    product.style.display = "none";
+                    card.style.display = "none";
                 }
             });
         });
     }
-
-    let chatbotBtn = document.querySelector(".chatbot");
-    if (chatbotBtn) {
-        chatbotBtn.addEventListener("click", function () {
-            let message = prompt("StyleHub Assistant:\nHow can I help you?");
-            if (message) {
-                alert("You asked: " + message + "\n\nChatbot feature coming soon!");
-            }
-        });
-    }
 });
-

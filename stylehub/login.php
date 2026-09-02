@@ -1,10 +1,12 @@
-<?php
+﻿<?php
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
 include("db.php");
+
+$loginError = "";
 
 if(isset($_POST['login']))
 {
@@ -29,106 +31,126 @@ if(isset($_POST['login']))
     }
     else
     {
-        echo "<script>alert('Invalid Username or Password');</script>";
+        $loginError = "Invalid username or password. Please try again.";
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
-
-body{
-    background:#ddaeae;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-
-.login-box{
-    background:#cd7171;
-    padding:30px;
-    width:350px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(209, 136, 207, 0.2);
-}
-
-h2{
-    text-align:center;
-    margin-bottom:20px;
-    color:white;
-}
-
-input{
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border:1px solid #ccc;
-    border-radius:5px;
-    font-size:14px;
-}
-
-button{
-    width:100%;
-    padding:10px;
-    background:#ff6600;
-    color:white;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-    font-weight:bold;
-    margin-top:10px;
-}
-
-button:hover{
-    background:#e65c00;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In | StyleHub Boutique</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .back-home-link {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .error-banner {
+            background: var(--danger-light);
+            color: var(--danger);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+            border: 1px solid #FECACA;
+        }
+        .pw-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 16px;
+            padding: 4px;
+        }
+    </style>
 </head>
+<body class="auth-page">
 
-<body>
+    <a href="index.php" class="back-home-link">← Return to Store</a>
 
-<div class="login-box">
-    <h2>Clothing Store Login</h2>
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="auth-logo-badge">👗</div>
+            <h2>Welcome Back</h2>
+            <p>Sign in to access your saved bag and orders</p>
+        </div>
 
-<form id="loginForm" method="POST" action="login.php">
-    <input type="text" id="usernameInput" name="username" placeholder="Enter username" required autocomplete="username">
-    <input type="password" id="passwordInput" name="password" placeholder="Enter password" required autocomplete="current-password">
-    <button type="submit" id="loginButton" name="login">Login</button>
-    <p style="text-align:center; margin-top:15px; color:white;">
-      Don't have an account?
-      <a href="registration.php" style="color:#ffe4e1; text-decoration:none; font-weight:bold;">Register</a>
-    </p>
-</form>
+        <?php if(!empty($loginError)): ?>
+            <div class="error-banner"><?php echo $loginError; ?></div>
+        <?php endif; ?>
 
-</div>
+        <form id="loginForm" method="POST" action="login.php">
+            <div class="form-group">
+                <label for="usernameInput">Username</label>
+                <div class="form-input-wrapper">
+                    <input type="text" id="usernameInput" name="username" class="form-input" 
+                           placeholder="Enter your username" required autocomplete="username">
+                </div>
+            </div>
 
-<script>
-// Prevent Enter on username from submitting form or redirecting; focus password instead
-const usernameField = document.getElementById('usernameInput');
-const passwordField = document.getElementById('passwordInput');
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <div class="form-input-wrapper">
+                    <input type="password" id="passwordInput" name="password" class="form-input" 
+                           placeholder="Enter your password" required autocomplete="current-password">
+                    <button type="button" class="pw-toggle-btn" onclick="togglePasswordVisibility('passwordInput', this)" title="Toggle password">👁️</button>
+                </div>
+            </div>
 
-usernameField.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter' || event.keyCode === 13) {
-        event.preventDefault();
-        event.stopPropagation();
-        passwordField.focus();
-        return false;
+            <button type="submit" id="loginButton" name="login" class="auth-submit-btn">
+                Sign In to StyleHub
+            </button>
+
+            <div class="auth-footer-text">
+                Don't have an account yet?
+                <a href="registration.php">Create Account</a>
+            </div>
+            
+            <div style="text-align:center; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+                <a href="admin_login.php" style="font-size:12px; color:var(--text-muted); font-weight:600;">Staff Admin Login →</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    // Smooth Enter navigation from username to password
+    const usernameField = document.getElementById('usernameInput');
+    const passwordField = document.getElementById('passwordInput');
+
+    usernameField.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            event.preventDefault();
+            event.stopPropagation();
+            passwordField.focus();
+            return false;
+        }
+    });
+
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            btn.innerText = '🙈';
+        } else {
+            input.type = 'password';
+            btn.innerText = '👁️';
+        }
     }
-});
-</script>
-
+    </script>
 </body>
 </html>
