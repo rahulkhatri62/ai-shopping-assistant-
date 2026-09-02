@@ -14,8 +14,8 @@ session_start();
 
         <!-- javaScript connect-->
          <script>
-         let name = "<?php echo $_SESSION['name']; ?>";
-         localStorage.setItem("name",name);
+         let name = "<?php echo isset($_SESSION['name']) ? htmlspecialchars($_SESSION['name']) : 'Guest'; ?>";
+         localStorage.setItem("name", name);
          </script>
          <script src="script.js"></script>
 
@@ -26,8 +26,15 @@ session_start();
 
 <nav>
 <a href="#home">Home</a>
-<a href="#products">Products</a>
-<a onclick="location.href='login.php'">log out</a>
+<a href="#products-title">Products</a>
+<a href="cart.php">🛒 Cart</a>
+<?php if(isset($_SESSION['name']) && !empty($_SESSION['name'])): ?>
+    <span style="color:#fff; padding:0 10px;">👤 <?php echo htmlspecialchars($_SESSION['name']); ?></span>
+    <a href="login.php">Log out</a>
+<?php else: ?>
+    <a href="login.php">Login</a>
+    <a href="registration.php">Register</a>
+<?php endif; ?>
 </nav>
 
 <section class="ai-assistant">
@@ -36,7 +43,7 @@ session_start();
     <input type="text" id="aiInput" 
            placeholder="search anything in your budget">
 
-    <button onclick="askAI()">search ⌕</search></button>
+    <button onclick="askAI()">Search ⌕</button>
 
     <div id="aiResponse"></div>
 </section>
@@ -52,24 +59,31 @@ session_start();
 <div class="products">    
 
  <div class="product">
-  <img src="images/kurti1.jpeg" alt="kurti" width="150">
-  <h3>Kurti</h3>
+  <img src="images/kurti1.jpeg" alt="Daily Wear Kurti" width="150">
+  <h3>Daily Wear Kurti</h3>
   <p>₹999</p>
-  <button onclick="addToCart('kurti',999,'images/kurti1.jpeg')">add to carts</button>
+  <button onclick="addToCart('Daily Wear Kurti', 999, 'images/kurti1.jpeg')">Add to Cart</button>
  </div>
 
  <div class="product">
-  <img src="images/kurti2.jpeg" alt="kurti" width="150">
-  <h3>kurti</h3>
+  <img src="images/kurti2.jpeg" alt="Party Silk Kurti" width="150">
+  <h3>Party Silk Kurti</h3>
   <p>₹1499</p>
-  <button onclick="addToCart('kurti',1499,'images/kurti2.jpeg')">add to carts</button>
+  <button onclick="addToCart('Party Silk Kurti', 1499, 'images/kurti2.jpeg')">Add to Cart</button>
  </div>
 
  <div class="product">
-  <img src="images/kurti3.jpeg" alt="kurti" width="150">
-  <h3>kurti</h3>
+  <img src="images/kurti3.jpeg" alt="Festive Embroidered Kurti" width="150">
+  <h3>Festive Embroidered Kurti</h3>
   <p>₹1199</p>
-  <button onclick="addToCart('kurti',1199,'images/kurti3.jpeg')">add to carts</button>
+  <button onclick="addToCart('Festive Embroidered Kurti', 1199, 'images/kurti3.jpeg')">Add to Cart</button>
+ </div>
+
+ <div class="product">
+  <img src="images/kurti4.jpeg" alt="Printed Cotton Kurti" width="150">
+  <h3>Printed Cotton Kurti</h3>
+  <p>₹899</p>
+  <button onclick="addToCart('Printed Cotton Kurti', 899, 'images/kurti4.jpeg')">Add to Cart</button>
  </div>
  
  <div id="cart"></div>
@@ -134,20 +148,17 @@ session_start();
 
 <script>
 function addToCart(productname, price, image){
-
-      let name = localStorage.getItem("name");
-
-      let cart = JSON.parse(localStorage.getItem("cart_" + name)) || [];
+      let userName = localStorage.getItem("name") || "Guest";
+      let cart = JSON.parse(localStorage.getItem("cart_" + userName)) || [];
 
       cart.push({
-        name: name,
+        name: productname,
         price: price,
         image: image
     });
 
-    localStorage.setItem("cart_" + name, JSON.stringify(cart));
-
-    alert("Product added successfully!");
+    localStorage.setItem("cart_" + userName, JSON.stringify(cart));
+    alert(productname + " added to cart successfully!");
 }
 
 function askAI() {

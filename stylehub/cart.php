@@ -68,10 +68,11 @@ button:hover{
 
 <table>
     <tr>
-        <th>product</th>
-        <th>price</th>  
-        <th>quantity</th>
-        <th>total</th>
+        <th>Product</th>
+        <th>Price</th>  
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>Action</th>
     </tr>
     <tbody id="cartItems"></tbody>
 
@@ -81,61 +82,62 @@ button:hover{
     Grand Total : ₹<span id="grand">0</span>
 </div>
 
-<form action="save_order.php" method="POST">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+    <a href="index.php" style="background:#8b3a3a; color:white; text-decoration:none; padding:10px 15px; border-radius:5px; font-weight:bold;">← Continue Shopping</a>
 
-    <input type="hidden" name="product_name" id="product_name">
-    <input type="hidden" name="quantity" id="quantity">
-    <input type="hidden" name="total_amount" id="total_amount">
-
-    <button type="submit">Place Order</button>
-</form>
-
+    <form action="save_order.php" method="POST" onsubmit="if(cart.length === 0){ alert('Your cart is empty!'); return false; }">
+        <input type="hidden" name="product_name" id="product_name">
+        <input type="hidden" name="quantity" id="quantity">
+        <input type="hidden" name="total_amount" id="total_amount">
+        <button type="submit" id="orderBtn">Place Order</button>
+    </form>
+</div>
 
 <script>
 
-let name = localStorage.getItem("name");
+let name = localStorage.getItem("name") || "Guest";
 let cart = JSON.parse(localStorage.getItem("cart_" + name)) || [];
     
 let output = "";
 let grand = 0;
 
-cart.forEach(function(item, index){
+if(cart.length === 0){
+    output = `<tr><td colspan="5" style="padding:20px; font-size:16px;">Your cart is currently empty!</td></tr>`;
+    document.getElementById("orderBtn").disabled = true;
+    document.getElementById("orderBtn").style.opacity = "0.5";
+    document.getElementById("orderBtn").style.cursor = "not-allowed";
+} else {
+    cart.forEach(function(item, index){
+       grand += Number(item.price);
+       output += `
+       <tr>
+           <td>${item.name}</td>
+           <td>₹${item.price}</td>
+           <td>1</td>
+           <td>₹${item.price}</td>
+           <td><button style="background:#e05252; color:white;" onclick="removeItem(${index})">Remove</button></td>
+       </tr>
+       `;
+    });
 
-   grand += Number(item.price);
-
-   output += `
-   <tr>
-       <td>${item.name}</td>
-       <td>₹${item.price}</td>
-       <td>1</td>
-       <td>₹${item.price}</td>
-       <td><button style="background:pink; color:white;"  onclick="removeItem(${index})">cancle</button></td>
-   </tr>
-   `;
-
-});    
+    let productNames = cart.map(function(item){ return item.name; }).join(", ");
+    document.getElementById("product_name").value = productNames;
+    document.getElementById("quantity").value = cart.length;
+    document.getElementById("total_amount").value = grand;
+}
 
 document.getElementById("cartItems").innerHTML = output;
 document.getElementById("grand").innerHTML = grand;
-
-if(cart.length > 0){
-
-document.getElementById("product_name").value = cart[0].name;
-document.getElementById("quantity").value = cart.length;
-document.getElementById("total_amount").value = grand;
-}
 
 function removeItem(index){
     cart.splice(index, 1);
     localStorage.setItem("cart_" + name, JSON.stringify(cart));
     location.reload();
- }
-
+}
 
 function checkout(){
     alert("Order Placed Successfully!");
 }
-
 
 </script>
 <br>

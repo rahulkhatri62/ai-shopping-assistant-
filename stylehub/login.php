@@ -4,20 +4,23 @@ include("db.php");
 
 if(isset($_POST['login']))
 {
-    $username = $_POST['name'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-    $sql = "SELECT * FROM users WHERE name='$name' AND password='$password'";
+    $username_safe = mysqli_real_escape_string($conn, $username);
+    $password_safe = mysqli_real_escape_string($conn, $password);
+
+    $sql = "SELECT * FROM users WHERE name='$username_safe' AND password='$password_safe'";
     $result = mysqli_query($conn, $sql);
 
-    if(mysqli_num_rows($result) > 0)
+    if($result && mysqli_num_rows($result) > 0)
     {
         $user = mysqli_fetch_assoc($result);
         
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['name'] = $user['name'];
 
-        header("location: index.php");
+        header("Location: index.php");
         exit();
     }
     else
@@ -91,9 +94,9 @@ button:hover{
     <h2>clothing store Login</h2>
 
 <form method="POST">
-    <input type="text" name="username" placeholder="enter username" required onkeydown="if(event.key=='enter'){event.preventDefault(); document.getElementById('password').focus();}">
-    <input type="password" name="password" placeholder="enter password" required>
-    <button type="submit" name="login" onclick="location.href='registration.php'">login</button>
+    <input type="text" name="username" placeholder="enter username" required onkeydown="if(event.key=='Enter'){event.preventDefault(); document.getElementById('password').focus();}">
+    <input type="password" name="password" id="password" placeholder="enter password" required>
+    <button type="submit" name="login">login</button>
     <p style="text-align:center;
       margin-top:15px">
       Don't have an account?

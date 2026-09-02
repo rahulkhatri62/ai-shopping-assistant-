@@ -108,7 +108,7 @@ button:hover{
 
 <div class="card">
   <h2>Total sales</h2>
-  <h1><?php echo $salesCount['total_sales']; ?></h1>
+  <h1>₹<?php echo number_format((float)($salesCount['total_sales'] ?? 0), 2); ?></h1>
 </div>
 
 </div>
@@ -117,7 +117,7 @@ button:hover{
 
    <button onclick="location.href='admin_login.php'">logout</button>
    <button onclick="location.href='index.php'">home</button>
-   <button onclick="location.href='index.php'">product</button>
+   <button onclick="location.href='index.php#products-title'">products</button>
  </div>
 
 
@@ -140,7 +140,7 @@ users.id,
 users.name,
 users.email,
 COUNT(`order`.id) AS total_order,
-IFNULL(SUM(order.total_amount),0) AS total_purchase
+IFNULL(SUM(`order`.total_amount),0) AS total_purchase
 FROM users
 LEFT JOIN `order` ON users.id = `order`.user_id
 GROUP BY users.id

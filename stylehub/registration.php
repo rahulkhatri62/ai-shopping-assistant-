@@ -3,21 +3,35 @@ include("db.php");
 
 if(isset($_POST['register']))
 {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    $name = trim($_POST['name'] ?? $_POST['Username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
 
-    $sql = "INSERT INTO users(name,email,password)
-    VALUES('$name','$email','$password')";
+    if (empty($name) || empty($email) || empty($password)) {
+        echo "<script>alert('Please fill in all required fields');</script>";
+    } elseif ($password !== $confirm_password) {
+        echo "<script>alert('Passwords do not match');</script>";
+    } else {
+        $name_safe = mysqli_real_escape_string($conn, $name);
+        $email_safe = mysqli_real_escape_string($conn, $email);
+        $password_safe = mysqli_real_escape_string($conn, $password);
 
-    if(mysqli_query($conn,$sql))
-    {
-        header("Location: login.php");
-        exit();
-    }
-    else
-    {
-        echo "Registration Failed";
+        $sql = "INSERT INTO users(name,email,password)
+        VALUES('$name_safe','$email_safe','$password_safe')";
+
+        if(mysqli_query($conn, $sql))
+        {
+            echo "<script>
+                    alert('Registration Successful! Please login.');
+                    window.location='login.php';
+                  </script>";
+            exit();
+        }
+        else
+        {
+            echo "<script>alert('Registration Failed: " . mysqli_error($conn) . "');</script>";
+        }
     }
 }
 ?>
@@ -100,22 +114,20 @@ a{
 
 <form method="POST">
 
-   <input type="text" name="fullname" placeholder="Full Name" required>
+   <input type="text" name="name" placeholder="Username" required>
 
-   <input type="email" name="email" placeholder="email" required>
+   <input type="email" name="email" placeholder="Email" required>
 
-   <input type="text" name="Username" placeholder="Username" required>
+   <input type="password" name="password" placeholder="Password" required>
 
-   <input type="password" name="password" placeholder="password" required>
+   <input type="password" name="confirm_password" placeholder="Confirm Password" required>
 
-   <input type="password" name="confirm_password" placeholder="confirm password" required>
-
-<button type="submit" name="register">register</button>
+<button type="submit" name="register">Register</button>
 <p style="text-align:center;
       margin-top:15px">
-      already have an account?
-      <a href="login.php" style="color:pink; text-decoration:none;
-      font-weight:bold;">login</a>
+      Already have an account?
+      <a href="login.php" style="color:#8b3a3a; text-decoration:none;
+      font-weight:bold;">Login</a>
     </p>
 </form>
 
