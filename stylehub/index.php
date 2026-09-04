@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
@@ -337,7 +337,7 @@ while($p = mysqli_fetch_assoc($productsQuery)) {
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 StyleHub Fashion Inc. All rights reserved.</p>
-            <p>Made with ❤️ by Nandani & Tanisha</p>
+            <p>Made with ❤️ by Nandani & Tanisha • StyleHub v2.0 (Updated September 2026)</p>
         </div>
     </footer>
 
