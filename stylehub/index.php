@@ -6,11 +6,77 @@ header("Expires: 0");
 
 include("db.php");
 
-// Fetch products dynamically from DB
-$productsQuery = mysqli_query($conn, "SELECT * FROM products ORDER BY id ASC");
+$defaultProducts = [
+    [
+        'id' => 1,
+        'name' => 'Casual Daily Cotton Kurti',
+        'category' => 'Daily Wear',
+        'price' => 999.00,
+        'original_price' => 1499.00,
+        'discount_percent' => 33,
+        'image' => 'images/kurti1.jpeg',
+        'description' => 'Breathable pure cotton straight kurti featuring elegant neck piping. Ideal for daily office, college, and casual outings.',
+        'fabric' => '100% Pure Cotton',
+        'rating' => 4.8,
+        'reviews_count' => 142,
+        'badge' => 'Best Value'
+    ],
+    [
+        'id' => 2,
+        'name' => 'Royal Party Silk Kurti',
+        'category' => 'Party Wear',
+        'price' => 1499.00,
+        'original_price' => 2299.00,
+        'discount_percent' => 35,
+        'image' => 'images/kurti2.jpeg',
+        'description' => 'Luxurious chanderi silk kurti adorned with delicate zari embroidery. Designed for receptions, evening soirees, and weddings.',
+        'fabric' => 'Chanderi Silk',
+        'rating' => 4.9,
+        'reviews_count' => 230,
+        'badge' => 'Bestseller'
+    ],
+    [
+        'id' => 3,
+        'name' => 'Festive Embroidered Kurti',
+        'category' => 'Festive',
+        'price' => 1199.00,
+        'original_price' => 1899.00,
+        'discount_percent' => 37,
+        'image' => 'images/kurti3.jpeg',
+        'description' => 'Vibrant festive flared kurti with intricate hand-thread needlework. Perfect for Diwali, Puja ceremonies, and family gatherings.',
+        'fabric' => 'Rayon Silk Blend',
+        'rating' => 4.7,
+        'reviews_count' => 98,
+        'badge' => 'Trending'
+    ],
+    [
+        'id' => 4,
+        'name' => 'Printed Floral Anarkali Kurti',
+        'category' => 'Anarkali',
+        'price' => 899.00,
+        'original_price' => 1299.00,
+        'discount_percent' => 31,
+        'image' => 'images/kurti4.jpeg',
+        'description' => 'Flowy floral printed Anarkali kurti crafted from soft modal fabric. Lightweight, stylish, and comfortable for all-day wear.',
+        'fabric' => 'Modal Cotton',
+        'rating' => 4.6,
+        'reviews_count' => 64,
+        'badge' => 'New Arrival'
+    ]
+];
+
 $allProducts = [];
-while($p = mysqli_fetch_assoc($productsQuery)) {
-    $allProducts[] = $p;
+if (isset($conn) && $conn) {
+    $productsQuery = @mysqli_query($conn, "SELECT * FROM products ORDER BY id ASC");
+    if ($productsQuery && mysqli_num_rows($productsQuery) > 0) {
+        while($p = mysqli_fetch_assoc($productsQuery)) {
+            $allProducts[] = $p;
+        }
+    }
+}
+
+if (empty($allProducts)) {
+    $allProducts = $defaultProducts;
 }
 ?>
 <!DOCTYPE html>
